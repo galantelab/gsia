@@ -1,12 +1,13 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include <assert.h>
+#include <hyper.h>
 
-#define N_DIGITS 10
-#define error(...) do { fprintf (stderr, __VA_ARGS__);  exit (1); } while (0)
-
-void
+static void
 fact (mpf_t result, int n)
 {
 	assert (n >= 0);
@@ -17,9 +18,10 @@ fact (mpf_t result, int n)
 		mpf_mul_ui (result, result, i);
 }
 
-void
+static void
 choose (mpf_t result, int n, int p)
 {
+	/*printf ("n = %d p = %d\n", n, p);*/
 	assert (n >= 0 && p >= 0 && n >= p);
 
 	mpf_t fp, fnp;
@@ -35,7 +37,7 @@ choose (mpf_t result, int n, int p)
 	mpf_clears (fp, fnp, NULL);
 }
 
-void
+static void
 phyper (mpf_t result, int N, int K, int n, int k)
 {
 	mpf_t cnk, cnn;
@@ -51,7 +53,9 @@ phyper (mpf_t result, int N, int K, int n, int k)
 	mpf_clears (cnk, cnn, NULL);
 }
 
-void
+// N >= K n >= k N >= n (N-K) >= (n-k)
+// Mayb return until k and k-1
+static void
 phyper_cdf (mpf_t result, int N, int K, int n, int k)
 {
 	assert (k >= 0);
@@ -61,6 +65,7 @@ phyper_cdf (mpf_t result, int N, int K, int n, int k)
 
 	for (int i = 0; i <= k; i++)
 		{
+			/*if ((N - K) < (n - i)) continue;*/
 			phyper (tmp, N, K, n, i);
 			mpf_add (result, result, tmp);
 		}
@@ -68,31 +73,23 @@ phyper_cdf (mpf_t result, int N, int K, int n, int k)
 	mpf_clear (tmp);
 }
 
-int
-main (int argc, char *argv[])
+void
+hyper (hyper_s *h, int N, int K, int n, int k)
 {
-	if (argc != 5)
-		error ("Usage %s N K n k\n", argv[0]);
-
-	int N = atoi (argv[1]);
-	int K = atoi (argv[2]);
-	int n = atoi (argv[3]);
-	int k = atoi (argv[4]);
+	assert (h != NULL);
 
 	mpf_t pmf, cdfi, cdfe;
 	mpf_inits (pmf, cdfi, cdfe, NULL);
 
 	phyper (pmf, N, K, n, k);
 	phyper_cdf (cdfi, N, K, n, k);
-	phyper_cdf (cdfe, N, K, n, k - 1);
+	phyper_cdf (cdfe, N, K, n, k > 0 ? k - 1 : k);
 
-	gmp_printf ("[N=%d K=%d n=%d k=%d]\n", N, K, n, k);
-	gmp_printf ("P(N eq %d) = %.*Ff\n", k, N_DIGITS, pmf);
-	gmp_printf ("P(N lt %d) = %.*Ff\n", k, N_DIGITS, cdfe);
-	gmp_printf ("P(N le %d) = %.*Ff\n", k, N_DIGITS, cdfi);
-	gmp_printf ("P(N gt %d) = %.*lf\n", k, N_DIGITS, 1 - mpf_get_d (cdfi));
-	gmp_printf ("P(N ge %d) = %.*lf\n", k, N_DIGITS, 1 - mpf_get_d (cdfe));
+	*h = (hyper_s){
+		.pmf  = mpf_get_d (pmf),
+		.cdfi = mpf_get_d (cdfi),
+		.cdfe = mpf_get_d (cdfe)
+	};
 
-	mpf_clears (pmf, cdfe, cdfi, NULL);
-	return 0;
+	mpf_clears (pmf, cdfi, cdfe, NULL);
 }
