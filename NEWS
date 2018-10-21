@@ -1,0 +1,6 @@
+Version 0.1.0
+
+* Initial version. Project was set to work with 'autotools' and
+  testing with the framework 'check'.
+
+* For now, it is only possible to run a hypergeometric test.

@@ -1,0 +1,9 @@
+2018-10-21 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Version 0.1.0
+
+	* Initialize 'gsia' project.
+
+	* Configure to autotools format.
+
+	* Add tests with framework 'check'.
