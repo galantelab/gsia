@@ -6,6 +6,7 @@ AC_INIT([gsia], [0.1.0], [tmiller@mochsl.org.br])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
@@ -21,10 +22,15 @@ AC_CHECK_LIB(gmp, __gmpz_init, ,
 	[AC_MSG_ERROR([GNU MP not found, see https://gmplib.org/])])
 
 PKG_CHECK_MODULES([CHECK], [check], ,
-	[AC_MSG_WARN([check not found, It will not possible to run 'make check'])])
+	[AC_MSG_WARN([check not found, It will not be possible to run 'make check'])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdio.h stdlib.h string.h stdarg.h errno.h assert.h gmp.h check.h])
+AC_HEADER_STDC
+AC_HEADER_ASSERT
+AC_CHECK_HEADERS([stdlib.h string.h gmp.h check.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIZE_T
 
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
 AC_OUTPUT
