@@ -9,6 +9,38 @@
 #include <errno.h>
 #include <error.h>
 
+static char const * const local_e_msg[] = {
+	"Success",
+	"Operation failed",
+	"Not enough argument"
+};
+
+char const *
+strerrnum (int errnum)
+{
+	int domain, error_code;
+	char const * msg = NULL;
+
+	domain = get_error_domain (errnum);
+	error_code = get_error_code (errnum);
+
+	switch (domain)
+		{
+		case D_LOCAL:
+			{
+				msg = local_e_msg[error_code];
+				break;
+			}
+		case D_SYSTEM:
+			{
+				msg = strerror (error_code);
+				break;
+			}
+		}
+
+	return msg;
+}
+
 void
 error (int status, int errnum, const char *format, ...)
 {
@@ -17,13 +49,19 @@ error (int status, int errnum, const char *format, ...)
 				PACKAGE, strerror (errno));
 
 	va_list ap;
+	char const *errnum_msg;
+
 	va_start (ap, format);
 
 	fprintf (stderr, "%s: ", PACKAGE);
 	vfprintf (stderr, format, ap);
 
 	if (errnum)
-		fprintf (stderr, ": %s", strerror (errnum));
+		{
+			errnum_msg = strerrnum (errnum);
+			if (errnum_msg != NULL)
+				fprintf (stderr, ": %s", errnum_msg);
+		}
 
 	fprintf (stderr, "\n");
 

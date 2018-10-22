@@ -13,7 +13,7 @@ int
 main (int argc, char *argv[])
 {
 	if (argc != 5)
-		error (1, 0, "Usage %s N K n k", PACKAGE);
+		error (1, set_error_code (D_LOCAL, E_NOARG), "Usage %s N K n k", PACKAGE);
 
 	int N = atoi (argv[1]);
 	int K = atoi (argv[2]);
