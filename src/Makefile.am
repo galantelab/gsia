@@ -8,4 +8,7 @@ libgsia_la_SOURCES = \
 		hyper.c \
 		hyper.h \
 		error.c \
-		error.h
+		error.h \
+		array.c \
+		array.h \
+		types.h
