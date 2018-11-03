@@ -11,7 +11,8 @@ enum local_e
 {
 	E_SUCCESS = 0,
 	E_FAILED,
-	E_NOARG
+	E_NOARG,
+	E_NOLINE
 };
 
 #define set_error_code(domain, error_code) ((domain << 16) | (error_code))
