@@ -11,4 +11,10 @@ libgsia_la_SOURCES = \
 		error.h \
 		array.c \
 		array.h \
+		io.c \
+		io.h \
+		utils.c \
+		utils.h \
+		comm.c \
+		comm.h \
 		types.h
