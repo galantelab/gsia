@@ -1,3 +1,13 @@
+Version 0.2.0
+
+* Implement error handling mechanism with domains and error code
+  in order to avoid rewriting sys error code.
+
+* Add an array (PtrArray) interface based on GArray.
+
+* Add IO interface to read a whole file line into a PtrArray. Also,
+  implement a unix-like 'comm' function to compare file lines.
+
 Version 0.1.0
 
 * Initial version. Project was set to work with 'autotools' and

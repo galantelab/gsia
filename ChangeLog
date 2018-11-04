@@ -1,3 +1,39 @@
+2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
+
+	* Version 0.2.0
+
+2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
+
+	* comm.c (compare_ptr): Fix shared attribute assignment
+
+2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
+
+	* NEWS: array.c (ptr_array_sort, ptr_array_uniq)
+
+2018-11-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Split and update files in order to organize functions
+
+2018-11-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* NEWS: comm.[ch], io.[ch], utils.[ch]
+
+2018-11-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* check_gsia_main.c (srunner_set_tap ())
+
+2018-11-01 Thiago L. A. Miller <tmiller@mochsl.org>
+
+	* NEW: array.c, array.h and tests
+
+2018-10-22 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* NEWS: error.h (enum domain_e, local_e); print_err_msg
+
+2018-10-21 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Add dist_data_DATA = README.md
+
 2018-10-21 Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 	* Version 0.1.0
