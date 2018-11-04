@@ -32,7 +32,7 @@ main (int argc, char *argv[])
 	PtrArray *array2 = NULL;
 	/*PtrArray *array3 = NULL;*/
 
-	comm = comm_new (free, &rc);
+	comm = comm_new (NULL, &rc);
 	array1 = ptr_array_new (free, &rc);
 	array2 = ptr_array_new (free, &rc);
 	/*array3 = ptr_array_new (free, &rc);*/
@@ -123,7 +123,7 @@ main (int argc, char *argv[])
 		printf ("- %s\n", (char *) ptr_array_get (comm->shared, i));
 
 Exit:
-	comm_free (comm, 0);
+	comm_free (comm, 1);
 	ptr_array_free (array1, 1);
 	ptr_array_free (array2, 1);
 	/*ptr_array_free (array3, 1);*/
