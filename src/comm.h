@@ -15,6 +15,6 @@ typedef struct _Comm Comm;
 
 void comm_free (Comm *comm, int free_segment);
 Comm *comm_new (DestroyNotify element_free_func, int *errnum);
-int compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2, EqualFunc equal_ptr);
+int compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2, CompareFunc compare_ptr);
 
 #endif /* comm.h */

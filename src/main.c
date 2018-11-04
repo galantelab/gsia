@@ -17,13 +17,7 @@
 static int
 cmpstringp (const void *p1, const void *p2)
 {
-	return strcmp (* (char * const *) p1, * (char * const *) p2);
-}
-
-static int
-equalstringp (const void *p1, const void *p2)
-{
-	return !strcasecmp ((const char *) p1, (const char*) p2) ? 1 : 0;
+	return strcasecmp (* (char * const *) p1, * (char * const *) p2);
 }
 
 int
@@ -105,11 +99,11 @@ main (int argc, char *argv[])
 
 	/*assert (rc == 0);*/
 
-	qsort (array1->pdata, array1->len, sizeof (char *), cmpstringp);
-	qsort (array2->pdata, array2->len, sizeof (char *), cmpstringp);
-	/*qsort (array3->pdata, array3->len, sizeof (char *), cmpptringp);*/
+	ptr_array_uniq (array1, cmpstringp);
+	ptr_array_uniq (array2, cmpstringp);
+	/*qsort (array3->pdata, array3->len, sizeof (char *), cmpstringp);*/
 
-	rc = compare_arrays (comm, array1, array2, equalstringp);
+	rc = compare_arrays (comm, array1, array2, cmpstringp);
 	if (rc != E_SUCCESS)
 		{
 			error (0, rc, "Error during comparing files '%s' and '%s'", argv[1], argv[2]);
@@ -118,15 +112,15 @@ main (int argc, char *argv[])
 
 	printf ("Uniq lines to %s\n", argv[1]);
 	for  (int i = 0;  i < comm->uniq_to_file1->len; i++)
-		printf ("- %s\n", ptr_array_get (comm->uniq_to_file1, i));
+		printf ("- %s\n", (char *) ptr_array_get (comm->uniq_to_file1, i));
 
 	printf ("Uniq lines to %s\n", argv[2]);
 	for  (int i = 0;  i < comm->uniq_to_file2->len; i++)
-		printf ("- %s\n", ptr_array_get (comm->uniq_to_file2, i));
+		printf ("- %s\n", (char *) ptr_array_get (comm->uniq_to_file2, i));
 
 	printf ("Shared lines between %s and %s\n", argv[1], argv[2]);
 	for  (int i = 0;  i < comm->shared->len; i++)
-		printf ("- %s\n", ptr_array_get (comm->shared, i));
+		printf ("- %s\n", (char *) ptr_array_get (comm->shared, i));
 
 Exit:
 	comm_free (comm, 0);

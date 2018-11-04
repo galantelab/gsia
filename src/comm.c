@@ -82,53 +82,50 @@ compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2,
 		CompareFunc compare_ptr)
 {
 	assert (comm != NULL);
-	assert (equal_ptr != NULL);
+	assert (compare_ptr != NULL);
 	assert (array1 != NULL && array1->len > 0 && array1->pdata != NULL);
 	assert (array2 != NULL && array2->len > 0 && array2->pdata != NULL);
 
 	int errnum = 0;
-	int i, j;
+	int i = 0, j = 0;
 	errno = 0;
 
-	for (i = 0, j = 0; i < array1->len; i++)
+	while (i < array1->len)
 		{
 			void *ptr1 = ptr_array_get (array1, i);
 
-			if (i < array2->len)
+			if (j < array2->len)
 				{
-					void *ptr2 = ptr_array_get (array2, i);
-					int cmp = compare_ptr (ptr1, ptr2);
+					void *ptr2 = ptr_array_get (array2, j);
+					int cmp = compare_ptr (&ptr1, &ptr2);
 
 					if (!cmp)
 						{
 							errnum = ptr_array_add (comm->shared, ptr1);
 							if (errnum != E_SUCCESS)
 								goto Exit;
+							i++, j++;
+							continue;
 						}
-					else
+					else if (cmp > 0)
 						{
-							errnum = ptr_array_add (comm->uniq_to_file1, ptr1);
-							if (errnum != E_SUCCESS)
-								goto Exit;
-
-							assert (errnum == 0);
-
 							errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
 							if (errnum != E_SUCCESS)
 								goto Exit;
+							j++;
+							continue;
 						}
 				}
-			else
-				{
-					errnum = ptr_array_add (comm->uniq_to_file1, ptr1);
-					if (errnum != E_SUCCESS)
-						goto Exit;
-				}
+
+			errnum = ptr_array_add (comm->uniq_to_file1, ptr1);
+			if (errnum != E_SUCCESS)
+				goto Exit;
+			i++;
 		}
 
-	for (int i = array1->len; i < array2->len; i++)
+	for (; j < array2->len; j++)
 		{
-			void *ptr2 = ptr_array_get (array2, i);
+			void *ptr2 = ptr_array_get (array2, j);
 
 			errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
 			if (errnum != E_SUCCESS)
@@ -137,8 +134,4 @@ compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2,
 
 Exit:
 	return errnum;
-
-Fail:
-	errnum = set_error_code (D_SYSTEM, errno);
-	goto Exit;
 }
