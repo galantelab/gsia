@@ -62,6 +62,55 @@ START_TEST (test_array_no_free_segment)
 }
 END_TEST
 
+static int
+cmpstringp (const void *p1, const void *p2)
+{
+	return strcmp (* (char * const *) p1, * (char * const *) p2);
+}
+
+START_TEST (test_array_uniq)
+{
+	PtrArray *arr = ptr_array_new (free, NULL);
+	int ponga_size = 15;
+
+	char *ponga[] = {
+		"Ponga1",
+		"Ponga1",
+		"Ponga5",
+		"Ponga5",
+		"Ponga5",
+		"Ponga1",
+		"Ponga1",
+		"Ponga2",
+		"Ponga3",
+		"Ponga4",
+		"Ponga4",
+		"Ponga4",
+		"Ponga4",
+		"Ponga5",
+		"Ponga5"
+	};
+
+	int uniq_size = 5;
+	char *uniq[] = {
+		"Ponga1",
+		"Ponga2",
+		"Ponga3",
+		"Ponga4",
+		"Ponga5",
+	};
+
+	for (int i = 0; i < ponga_size; i++)
+		ptr_array_add (arr, strdup (ponga[i]));
+
+	ptr_array_uniq (arr, cmpstringp);
+	ck_assert_int_eq (arr->len, uniq_size);
+
+	for (int i = 0; i < arr->len; i++)
+		ck_assert_str_eq ((char *) ptr_array_get (arr, i), uniq[i]);
+}
+END_TEST
+
 Suite *
 make_array_suite (void)
 {
@@ -75,6 +124,7 @@ make_array_suite (void)
 	tc_core = tcase_create ("Core");
 
 	tcase_add_test (tc_core, test_array);
+	tcase_add_test (tc_core, test_array_uniq);
 	suite_add_tcase (s, tc_core);
 
 	/* Free test case */

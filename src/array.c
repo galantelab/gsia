@@ -126,3 +126,48 @@ ptr_array_add (PtrArray *array, void *ptr)
 
 	return errnum;
 }
+
+void
+ptr_array_sort (PtrArray *array, CompareFunc compare_func)
+{
+	assert (array != NULL);
+	assert (compare_func != NULL);
+
+	qsort (array->pdata, array->len, sizeof (void *), compare_func);
+}
+
+void
+ptr_array_uniq (PtrArray *array, CompareFunc compare_func)
+{
+	RealPtrArray *rarray = (RealPtrArray *) array;
+
+	assert (rarray != NULL);
+	assert (compare_func != NULL);
+
+	void **data;
+	size_t beacon, len;
+
+	data = rarray->pdata;
+	len = rarray->len;
+	beacon = 0;
+
+	ptr_array_sort (array, compare_func);
+
+	for (size_t i = 1; i < rarray->len; i++)
+		{
+			if (!compare_func (&data[beacon], &data[i]))
+				{
+					if (rarray->element_free_func != NULL)
+						{
+							rarray->element_free_func (data[i]);
+							data[i] = NULL;
+						}
+					len--;
+					continue;
+				}
+
+			data[++beacon] = data[i];
+		}
+
+	rarray->len = len;
+}
