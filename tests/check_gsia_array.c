@@ -108,6 +108,8 @@ START_TEST (test_array_uniq)
 
 	for (int i = 0; i < arr->len; i++)
 		ck_assert_str_eq ((char *) ptr_array_get (arr, i), uniq[i]);
+
+	ptr_array_free (arr, 1);
 }
 END_TEST
 
