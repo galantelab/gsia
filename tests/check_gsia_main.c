@@ -13,7 +13,7 @@ main (void)
 
 	sr = srunner_create (make_hyper_suite ());
 	srunner_add_suite (sr, make_array_suite ());
-	srunner_set_tap (sr, "-");
+	/*srunner_set_tap (sr, "-");*/
 
 	srunner_run_all (sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed (sr);
