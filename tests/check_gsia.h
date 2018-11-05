@@ -3,6 +3,7 @@
 
 Suite * make_hyper_suite (void);
 Suite * make_array_suite (void);
-Suite * make_comm_suite (void);
+Suite * make_comm_suite  (void);
+Suite * make_io_suite    (void);
 
 #endif /* check_gsia.h */
