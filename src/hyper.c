@@ -40,6 +40,7 @@ choose (mpf_t result, int n, int p)
 static void
 phyper (mpf_t result, int N, int K, int n, int k)
 {
+	/*printf ("N = %d K = %d n = %d k = %d\n", N, K, n, k);*/
 	mpf_t cnk, cnn;
 	mpf_inits (cnk, cnn, NULL);
 
@@ -65,7 +66,7 @@ phyper_cdf (mpf_t result, int N, int K, int n, int k)
 
 	for (int i = 0; i <= k; i++)
 		{
-			/*if ((N - K) < (n - i)) continue;*/
+			if ((N - K) < (n - i)) continue;
 			phyper (tmp, N, K, n, i);
 			mpf_add (result, result, tmp);
 		}
