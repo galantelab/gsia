@@ -1,3 +1,17 @@
+Version 0.3.0
+
+* Add .travis.yml in order to enable cloud testing inside a
+  vanilla environment. Include a travis CI badge into the
+  README.md.
+
+* Make hypergeometric testing workable. Now, the user can
+  pass 3 files (the universe list, the success state list
+  and the testing list) and gsia will automatically calculate
+  all the required parameters to make the test (N, K, n, k).
+
+* Fix a bug in the phyper function that causes assertion
+  error.
+
 Version 0.2.0
 
 * Implement error handling mechanism with domains and error code

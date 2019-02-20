@@ -1,12 +1,32 @@
-2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
+2019-02-19 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Version 0.3.0
+
+	* main.c: Add hypergeometric test
+
+	* FIX: hyper.c (phyper): test ((N - K) < (n - i))
+
+2018-11-05 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* NEWS: tests/check_gsia_io.c
+
+	* NEWS: tests/check_gsia_comm.c
+
+2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* tests/check_gsia_array.c (test_array_uniq): Add ptr_array_free
+
+	* Update README.md
+
+	* Add: .travis.yml
+
+	* main.c (comm_new, comm_free): Set func to NULL and free_segment to 1
+
+2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 	* Version 0.2.0
 
-2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
-
 	* comm.c (compare_ptr): Fix shared attribute assignment
-
-2018-11-04 Thiago L. A. Miller <tmiller@mochsl.org>
 
 	* NEWS: array.c (ptr_array_sort, ptr_array_uniq)
 
@@ -14,11 +34,7 @@
 
 	* Split and update files in order to organize functions
 
-2018-11-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
-
 	* NEWS: comm.[ch], io.[ch], utils.[ch]
-
-2018-11-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 	* check_gsia_main.c (srunner_set_tap ())
 
