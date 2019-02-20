@@ -118,17 +118,17 @@ main (int argc, char *argv[])
 			goto Exit;
 		}
 
-	rc = compare_arrays (comm2_3, array2, array3, cmpstringp);
-	if (rc != E_SUCCESS)
-		{
-			error (0, rc, "Error during comparing files '%s' and '%s'", argv[2], argv[3]);
-			goto Exit;
-		}
-
 	rc = compare_arrays (comm1_3, array1, array3, cmpstringp);
 	if (rc != E_SUCCESS)
 		{
 			error (0, rc, "Error during comparing files '%s' and '%s'", argv[1], argv[3]);
+			goto Exit;
+		}
+
+	rc = compare_arrays (comm2_3, comm1_2->shared, comm1_3->shared, cmpstringp);
+	if (rc != E_SUCCESS)
+		{
+			error (0, rc, "Error during comparing files '%s' and '%s'", argv[2], argv[3]);
 			goto Exit;
 		}
 
