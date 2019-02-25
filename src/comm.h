@@ -13,8 +13,7 @@ struct _Comm
 
 typedef struct _Comm Comm;
 
-void comm_free (Comm *comm, int free_segment);
-Comm *comm_new (DestroyNotify element_free_func, int *errnum);
-int compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2, CompareFunc compare_ptr);
+Comm * compare_arrays (PtrArray *array1, PtrArray *array2, CompareFunc compare_ptr, int *errnum);
+void   comm_free      (Comm *comm);
 
 #endif /* comm.h */

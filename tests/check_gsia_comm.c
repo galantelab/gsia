@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <check.h>
-#include <check_gsia.h>
+#include "check_gsia.h"
 
 #include "../src/comm.h"
 
@@ -21,7 +21,6 @@ START_TEST (test_comm)
 	PtrArray *array1 = NULL;
 	PtrArray *array2 = NULL;
 
-	comm = comm_new (NULL, NULL);
 	array1 = ptr_array_new (NULL, NULL);
 	array2 = ptr_array_new (NULL, NULL);
 
@@ -40,7 +39,8 @@ START_TEST (test_comm)
 
 	ptr_array_sort (array1, cmpstringp);
 	ptr_array_sort (array2, cmpstringp);
-	compare_arrays (comm, array1, array2, cmpstringp);
+
+	comm = compare_arrays (array1, array2, cmpstringp, NULL);
 
 	for (int i = 0; i < comm->uniq_to_file1->len; i++)
 		ck_assert_str_eq (ptr_array_get (comm->uniq_to_file1, i), uniq1[i]);
@@ -50,6 +50,10 @@ START_TEST (test_comm)
 
 	for (int i = 0; i < comm->shared->len; i++)
 		ck_assert_str_eq (ptr_array_get (comm->shared, i), shared[i]);
+
+	comm_free (comm);
+	ptr_array_free (array1, 1);
+	ptr_array_free (array2, 1);
 }
 END_TEST
 

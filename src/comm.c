@@ -5,12 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <errno.h>
-#include <error.h>
-#include <comm.h>
+#include "error.h"
+#include "comm.h"
 
-Comm *
-comm_new (DestroyNotify element_free_func, int *errnum)
+static Comm *
+comm_new (int *errnum)
 {
 	assert (errnum == NULL || *errnum == 0);
 
@@ -24,7 +23,7 @@ comm_new (DestroyNotify element_free_func, int *errnum)
 			goto Exit;
 		}
 
-	comm->uniq_to_file1 = ptr_array_new (element_free_func, errnum);
+	comm->uniq_to_file1 = ptr_array_new (NULL, errnum);
 	if (comm->uniq_to_file1 == NULL)
 		{
 			assert (errnum == NULL || *errnum != 0);
@@ -33,7 +32,7 @@ comm_new (DestroyNotify element_free_func, int *errnum)
 
 	assert (errnum == NULL || *errnum == 0);
 
-	comm->uniq_to_file2 = ptr_array_new (element_free_func, errnum);
+	comm->uniq_to_file2 = ptr_array_new (NULL, errnum);
 	if (comm->uniq_to_file2 == NULL)
 		{
 			assert (errnum == NULL || *errnum != 0);
@@ -42,7 +41,7 @@ comm_new (DestroyNotify element_free_func, int *errnum)
 
 	assert (errnum == NULL || *errnum == 0);
 
-	comm->shared = ptr_array_new (element_free_func, errnum);
+	comm->shared = ptr_array_new (NULL, errnum);
 	if (comm->shared == NULL)
 		{
 			assert (errnum == NULL || *errnum != 0);
@@ -55,40 +54,51 @@ Exit:
 	return comm;
 
 Fail:
-	comm_free (comm, 0);
+	comm_free (comm);
+	comm = NULL;
 	goto Exit;
 }
 
 void
-comm_free (Comm *comm, int free_segment)
+comm_free (Comm *comm)
 {
 	if (comm == NULL)
 		return;
 
 	if (comm->uniq_to_file1 != NULL)
-		ptr_array_free (comm->uniq_to_file1, free_segment);
+		ptr_array_free (comm->uniq_to_file1, 1);
 
 	if (comm->uniq_to_file2 != NULL)
-		ptr_array_free (comm->uniq_to_file2, free_segment);
+		ptr_array_free (comm->uniq_to_file2, 1);
 
 	if (comm->shared != NULL)
-		ptr_array_free (comm->shared, free_segment);
+		ptr_array_free (comm->shared, 1);
 
 	free (comm);
 }
 
-int
-compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2,
-		CompareFunc compare_ptr)
+Comm *
+compare_arrays (PtrArray *array1, PtrArray *array2,
+		CompareFunc compare_ptr, int *errnum)
 {
-	assert (comm != NULL);
 	assert (compare_ptr != NULL);
 	assert (array1 != NULL && array1->len > 0 && array1->pdata != NULL);
 	assert (array2 != NULL && array2->len > 0 && array2->pdata != NULL);
+	assert (errnum == NULL || *errnum == 0);
 
-	int errnum = 0;
+	Comm *comm = NULL;
 	int i = 0, j = 0;
+	int tmp_errnum = 0;
 	errno = 0;
+
+	comm = comm_new (errnum);
+	if (comm == NULL)
+		{
+			assert (errnum == NULL || *errnum != 0);
+			goto Exit;
+		}
+
+	assert (errnum == NULL || *errnum == 0);
 
 	while (i < array1->len)
 		{
@@ -101,25 +111,37 @@ compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2,
 
 					if (!cmp)
 						{
-							errnum = ptr_array_add (comm->shared, ptr1);
-							if (errnum != E_SUCCESS)
-								goto Exit;
+							tmp_errnum = ptr_array_add (comm->shared, ptr1);
+							if (tmp_errnum != E_SUCCESS)
+								{
+									if (errnum != NULL)
+										*errnum = tmp_errnum;
+									goto Fail;
+								}
 							i++, j++;
 							continue;
 						}
 					else if (cmp > 0)
 						{
-							errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
-							if (errnum != E_SUCCESS)
-								goto Exit;
+							tmp_errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
+							if (tmp_errnum != E_SUCCESS)
+								{
+									if (errnum != NULL)
+										*errnum = tmp_errnum;
+									goto Fail;
+								}
 							j++;
 							continue;
 						}
 				}
 
-			errnum = ptr_array_add (comm->uniq_to_file1, ptr1);
-			if (errnum != E_SUCCESS)
-				goto Exit;
+			tmp_errnum = ptr_array_add (comm->uniq_to_file1, ptr1);
+			if (tmp_errnum != E_SUCCESS)
+				{
+					if (errnum != NULL)
+						*errnum = tmp_errnum;
+					goto Fail;
+				}
 			i++;
 		}
 
@@ -127,11 +149,20 @@ compare_arrays (Comm *comm, PtrArray *array1, PtrArray *array2,
 		{
 			void *ptr2 = ptr_array_get (array2, j);
 
-			errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
-			if (errnum != E_SUCCESS)
-				goto Exit;
+			tmp_errnum = ptr_array_add (comm->uniq_to_file2, ptr2);
+			if (tmp_errnum != E_SUCCESS)
+				{
+					if (errnum != NULL)
+						*errnum = tmp_errnum;
+					goto Fail;
+				}
 		}
 
 Exit:
-	return errnum;
+	return comm;
+
+Fail:
+	comm_free (comm);
+	comm = NULL;
+	goto Exit;
 }
