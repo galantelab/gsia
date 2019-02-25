@@ -18,8 +18,13 @@ AC_PROG_CC_C99
 AC_PROG_INSTALL
 
 # Checks for libraries.
-AC_CHECK_LIB(gmp, __gmpz_init, ,
-	[AC_MSG_ERROR([GNU MP not found, see https://gmplib.org/])])
+AC_CHECK_LIB([m], [cos])
+AC_CHECK_LIB([gslcblas], [cblas_dgemm], [have_gslcblas=yes])
+AC_CHECK_LIB([gsl], [gsl_blas_dgemm], [have_gsl=yes])
+
+if ! test x$have_gslcblas = xyes -a x$have_gsl = xyes; then
+	AC_MSG_WARN([GNU Scientific Library not found, see https://www.gnu.org/software/gsl/])
+fi
 
 PKG_CHECK_MODULES([CHECK], [check], ,
 	[AC_MSG_WARN([check not found, It will not be possible to run 'make check'])])
@@ -27,7 +32,7 @@ PKG_CHECK_MODULES([CHECK], [check], ,
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_ASSERT
-AC_CHECK_HEADERS([stdlib.h string.h gmp.h check.h])
+AC_CHECK_HEADERS([gsl/gsl_randist.h gsl/gsl_cdf.h check.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T

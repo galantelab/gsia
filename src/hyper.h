@@ -1,15 +1,18 @@
 #ifndef HYPER_H
 #define HYPER_H
 
-struct hyper_s
+struct _Hyper
 {
 	double pmf;
-	double cdfe;
-	double cdfi;
+	double cdfe_P;
+	double cdfi_P;
+	double cdfe_Q;
+	double cdfi_Q;
 };
 
-typedef struct hyper_s hyper_s;
+typedef struct _Hyper Hyper;
 
-void hyper (hyper_s *h, int N, int K, int n, int k);
+Hyper * hyper      (int N, int K, int n, int k, int *errnum);
+void    hyper_free (Hyper *h);
 
 #endif /* hyper.h */
