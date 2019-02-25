@@ -19,12 +19,8 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 AC_CHECK_LIB([m], [cos])
-AC_CHECK_LIB([gslcblas], [cblas_dgemm], [have_gslcblas=yes])
-AC_CHECK_LIB([gsl], [gsl_blas_dgemm], [have_gsl=yes])
-
-if ! test x$have_gslcblas = xyes -a x$have_gsl = xyes; then
-	AC_MSG_WARN([GNU Scientific Library not found, see https://www.gnu.org/software/gsl/])
-fi
+AC_CHECK_LIB([gslcblas], [cblas_dgemm])
+AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
 
 PKG_CHECK_MODULES([CHECK], [check], ,
 	[AC_MSG_WARN([check not found, It will not be possible to run 'make check'])])
