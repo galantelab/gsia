@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <utils.h>
+#include "utils.h"
 
 char *
 chomp (char *str)

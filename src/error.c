@@ -6,8 +6,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <errno.h>
-#include <error.h>
+#include "error.h"
 
 static char const * const local_e_msg[] = {
 	"Success",

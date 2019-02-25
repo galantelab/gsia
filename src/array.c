@@ -4,10 +4,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <assert.h>
-#include <error.h>
-#include <array.h>
+#include "error.h"
+#include "array.h"
 
 struct _RealPtrArray
 {

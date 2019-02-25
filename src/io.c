@@ -6,10 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <errno.h>
-#include <error.h>
-#include <utils.h>
-#include <io.h>
+#include "error.h"
+#include "utils.h"
+#include "io.h"
 
 int
 read_file_lines (PtrArray *array, const char *filename)

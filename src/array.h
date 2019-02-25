@@ -14,14 +14,10 @@ typedef struct _PtrArray PtrArray;
 
 #define ptr_array_get(array, index) ((array)->pdata)[index]
 
-PtrArray *ptr_array_new (DestroyNotify element_free_func, int *errnum);
-
-void **ptr_array_free (PtrArray *array, int free_segment);
-
-int ptr_array_add (PtrArray *array, void *ptr);
-
-void ptr_array_sort (PtrArray *array, CompareFunc compare_func);
-
-void ptr_array_uniq (PtrArray *array, CompareFunc compare_func);
+PtrArray  * ptr_array_new  (DestroyNotify element_free_func, int *errnum);
+void     ** ptr_array_free (PtrArray *array, int free_segment);
+int         ptr_array_add  (PtrArray *array, void *ptr);
+void        ptr_array_sort (PtrArray *array, CompareFunc compare_func);
+void        ptr_array_uniq (PtrArray *array, CompareFunc compare_func);
 
 #endif /* array.h */

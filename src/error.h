@@ -1,6 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include <errno.h>
+
 enum domain_e
 {
 	D_LOCAL = 0,

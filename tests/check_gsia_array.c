@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <check.h>
-#include <check_gsia.h>
+#include "check_gsia.h"
 
 #include "../src/array.h"
 
