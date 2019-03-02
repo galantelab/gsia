@@ -1,3 +1,13 @@
+Version 0.4.0
+
+* Replace GMP with GSL (Gnu Scientific Library) in order
+  to make hypergeometric tests. There is a big gain in
+	speed.
+
+* Change the 'comm' interface. Now there is no need to
+  create Comm objects and after that compare_arrays ().
+	compare_arrays () retuns an initialized Comm object.
+
 Version 0.3.0
 
 * Add .travis.yml in order to enable cloud testing inside a

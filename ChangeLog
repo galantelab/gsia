@@ -1,3 +1,23 @@
+2019-03-01 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Version 0.4.0
+
+2019-02-25 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* FIX: main.c, configure.ac
+
+2019-02-24 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Replace GMP with GSL
+
+	* comm.c (compare_arrays): return Comm
+
+	* hyper.c: Replace GMP with GSL
+
+2019-02-20 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* FIX: main.c (main): comm2_3 <- comm1_2, comm1_3
+
 2019-02-19 Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 	* Version 0.3.0
