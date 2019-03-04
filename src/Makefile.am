@@ -17,4 +17,6 @@ libgsia_la_SOURCES = \
 		utils.h \
 		comm.c \
 		comm.h \
-		types.h
+		types.h \
+		gsia.c \
+		gsia.h

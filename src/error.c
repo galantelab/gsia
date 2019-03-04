@@ -12,7 +12,8 @@ static char const * const local_e_msg[] = {
 	"Success",
 	"Operation failed",
 	"Not enough argument",
-	"File empty or has no valid entries"
+	"File empty or has no valid entries",
+	"There are no entries shared with universe"
 };
 
 char const *
