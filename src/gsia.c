@@ -14,6 +14,7 @@
 #include "gsia.h"
 
 #define N_DIGITS 20
+#define COMM_FILE "gsia_comm.txt"
 
 struct _Gsia
 {
@@ -377,65 +378,127 @@ gsia_print (const Gsia *g)
 {
 	assert (g != NULL);
 
-	printf ("%s\n", PACKAGE_STRING);
-	printf ("*******************************************************\n");
-	printf ("[universe]\n");
-	printf ("  File: '%s'\n", g->universe_file);
-	printf ("  Total: %zu\n", g->universe->len);
+	printf ("# name: metadata.tsv\n");
+	printf ("Name\tVersion\n");
+	printf ("%s\t%s\n", PACKAGE_NAME, PACKAGE_VERSION);
 
-	printf ("[list]\n");
-	printf ("  File: '%s'\n", g->list_file);
-	printf ("  Total: %zu\n", g->list->len);
-	printf ("  Shared with universe: %zu (%.2f%%)\n",
+	printf ("\n");
+
+	printf ("# name: universe.tsv\n");
+	printf ("File\tTotal\n");
+	printf ("%s\t%zu\n", g->universe_file, g->universe->len);
+
+	printf ("\n");
+
+	printf ("# name: list.tsv\n");
+	printf ("File\tTotal\tSharedWithUniverse\t%%SharedWithUniverse\n");
+	printf ("%s\t%zu\t%zu\t%.2f\n", g->list_file, g->list->len,
 			g->universe_list->shared->len,
 			(float) g->universe_list->shared->len * 100 / g->list->len);
-	printf ("*******************************************************\n\n");
+
+	printf ("\n");
+
+	printf ("# name: feature.tsv\n");
+	printf (
+			"FeatureID\tFile\tTotal\tSharedWithUniverse\t%%SharedWithUniverse\t"
+			"SharedWithUniverseAndList\t%%SharedWithUniverseAndList\t"
+			"P(X=x)\tP(X<x)\tP(X<=x)\tP(X>x)\tP(X>=x)\n"
+	);
 
 	for (int i = 0; i < g->featurec; i++)
 		{
-			printf ("[feature %d]\n", i + 1);
-			printf ("  File: '%s'\n", g->feature_file[i]);
-			printf ("  Total: %zu\n", g->feature[i]->len);
-			printf ("  Shared with universe: %zu (%.2f%%)\n",
+			printf ("%d\t%s\t%zu\t%zu\t%.2f",
+					i + 1, g->feature_file[i], g->feature[i]->len,
 					g->universe_feature[i]->shared->len,
 					(float) g->universe_feature[i]->shared->len * 100 / g->feature[i]->len);
 
 			if (g->list_feature[i] == NULL)
 				{
 					assert (g->universe_feature[i]->shared->len == 0);
-					printf ("\n** File '%s' does not share entries with universe '%s'\n\n",
-							g->feature_file[i], g->universe_file);
+					printf ("\t.\t.\t.\t.\t.\t.\t.\n");
 					continue;
 				}
 
-			printf ("  Shared with universe and list: %zu (%.2f%%)\n",
+			printf ("\t%zu\t%.2f",
 					g->list_feature[i]->shared->len,
 					(float) g->list_feature[i]->shared->len * 100 / g->feature[i]->len);
 
-			printf ("\n");
-
 			if (g->stat != NULL)
 				{
-					printf ("P(N eq %d) = %.*lf\n",
-							g->list_feature[i]->shared->len, N_DIGITS, g->stat[i]->pmf);
-					printf ("P(N lt %d) = %.*lf\n",
-							g->list_feature[i]->shared->len, N_DIGITS, g->stat[i]->cdfe_P);
-					printf ("P(N le %d) = %.*lf\n",
-							g->list_feature[i]->shared->len, N_DIGITS, g->stat[i]->cdfi_P);
-					printf ("P(N gt %d) = %.*lf\n",
-							g->list_feature[i]->shared->len, N_DIGITS, g->stat[i]->cdfe_Q);
-					printf ("P(N ge %d) = %.*lf\n",
-							g->list_feature[i]->shared->len, N_DIGITS, g->stat[i]->cdfi_Q);
+					printf ("\t%.*lf", N_DIGITS, g->stat[i]->pmf);
+					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfe_P);
+					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfi_P);
+					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfe_Q);
+					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfi_Q);
 				}
 			else
 				{
-					printf ("** Could not test against file '%s'\n", g->feature_file[i]);
-					printf ("   This file must share not enough values among universe (%s) and list (%s)\n",
-							g->universe_file, g->list_file);
+					printf ("\t.\t.\t.\t.\t.");
 				}
 
 			printf ("\n");
 		}
+}
+
+static int
+gsia_save_comm (const Gsia *g)
+{
+	assert (g != NULL);
+
+	FILE *fp = NULL;
+	int i = 0;
+	int j = 0;
+	int errnum = 0;
+	errno = 0;
+
+	fp = fopen (COMM_FILE, "w");
+	if (fp == NULL)
+		goto Fail;
+
+	fprintf (fp, "# name: list_shared_with_universe.txt\n");
+	for (i = 0; i < g->universe_list->shared->len; i++)
+		fprintf (fp, "%s\n", ptr_array_get (g->universe_list->shared, i));
+
+	fprintf (fp, "\n");
+
+	fprintf (fp, "# name: list_uniq.txt\n");
+	for (i = 0; i < g->universe_list->uniq_to_file2->len; i++)
+		fprintf (fp, "%s\n", ptr_array_get (g->universe_list->uniq_to_file2, i));
+
+	for (j = 0; j < g->featurec; j++)
+		{
+			fprintf (fp, "\n");
+
+			fprintf (fp, "# name: feature%d_shared_with_universe_and_list.txt\n", j + 1);
+			if (g->list_feature[j] != NULL)
+				{
+					for (i = 0; i < g->list_feature[j]->shared->len; i++)
+						fprintf (fp, "%s\n", ptr_array_get (g->list_feature[j]->shared, i));
+				}
+
+			fprintf (fp, "\n");
+
+			fprintf (fp, "# name: feature%d_shared_with_universe.txt\n", j + 1);
+			for (i = 0; i < g->universe_feature[j]->shared->len; i++)
+				fprintf (fp, "%s\n", ptr_array_get (g->universe_feature[j]->shared, i));
+
+			fprintf (fp, "\n");
+
+			fprintf (fp, "# name: feature%d_uniq.txt\n", j + 1);
+			for (i = 0; i < g->universe_feature[j]->uniq_to_file2->len; i++)
+				fprintf (fp, "%s\n", ptr_array_get (g->universe_feature[j]->uniq_to_file2, i));
+		}
+
+	if (fclose (fp) == EOF)
+		goto Fail;
+
+Exit:
+	return errnum;
+
+Fail:
+	errnum = set_error_code (D_SYSTEM, errno);
+	error (0, 0, "Failed to write to '%s'", COMM_FILE);
+	goto Exit;
 }
 
 int
@@ -471,6 +534,10 @@ gsia (const char *list, const char *universe,
 		goto Exit;
 
 	gsia_print (g);
+
+	errnum = gsia_save_comm (g);
+	if (errnum != E_SUCCESS)
+		goto Exit;
 
 Exit:
 	gsia_free (g);
