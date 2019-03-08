@@ -15,6 +15,7 @@ main (void)
 	srunner_add_suite (sr, make_array_suite ());
 	srunner_add_suite (sr, make_comm_suite ());
 	srunner_add_suite (sr, make_io_suite ());
+	srunner_add_suite (sr, make_utils_suite ());
 	/*srunner_set_tap (sr, "-");*/
 
 	srunner_run_all (sr, CK_NORMAL);
