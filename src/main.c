@@ -4,20 +4,131 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
+#include "array.c"
 #include "gsia.h"
 #include "error.h"
 
 int
 main (int argc, char *argv[])
 {
-	if (argc < 4)
-		return 0;
+	struct option opt[] =
+	{
+		{"version",       no_argument,       0, 'v'},
+		{"help",          no_argument,       0, 'h'},
+		{"ignore-case",   no_argument,       0, 'i'},
+		{"list-file",     required_argument, 0, 'l'},
+		{"universe-file", required_argument, 0, 'u'},
+		{"feature-file",  required_argument, 0, 'f'},
+		{0,               0,                 0,  0 }
+	};
+
+	const char *help_msg =
+		"Usage: " PACKAGE_NAME " [-h] [-v] [-i] -l FILE -u FILE -f FILE [,FILE ... | -f FILE ...]\n"
+		"\n"
+		"Options:\n"
+		"   -h, --help                   Show help options\n"
+		"   -v, --version                Show current version\n"
+		"   -i, --ignore-case            Ignore case distinctions\n"
+		"\n"
+		"Mandatory Options:\n"
+		"   -l, --list-file              LIST in test for observed successes\n"
+		"   -u, --universe-file          Population entries LIST\n"
+		"   -f, --feature-file           Array of success state entries LIST's\n";
+
+	const char *try_help_msg = "Try '" PACKAGE_NAME " --help' for more information";
+
+	if (argc == 1)
+		{
+			printf ("%s\n", help_msg);
+			exit (EXIT_SUCCESS);
+		}
 
 	int rc = 0;
+	const char *list_file = NULL;
+	const char *universe_file = NULL;
+	int ignore_case = 0;
+	PtrArray *feature_file = NULL;
 
-	rc = gsia (argv[1], argv[2], argc - 3, (const char **) argv + 3);
+	feature_file = ptr_array_new (NULL, &rc);
+	if (feature_file == NULL)
+		goto Fail;
+
+	int option_index = 0;
+	int c;
+
+	while (1)
+		{
+			c = getopt_long (argc, argv, "vhil:u:f:", opt, &option_index);
+			if (c == -1)
+				break;
+
+			switch (c)
+				{
+				case 'l':
+					{
+						list_file = optarg;
+						break;
+					}
+				case 'u':
+					{
+						universe_file = optarg;
+						break;
+					}
+				case 'f':
+					{
+						rc = ptr_array_add (feature_file, optarg);
+						if (rc != E_SUCCESS)
+							goto Fail;
+						break;
+					}
+				case 'v':
+					{
+						printf ("%s\n", PACKAGE_STRING);
+						exit (EXIT_SUCCESS);
+					}
+				case 'h':
+					{
+						printf ("%s\n", help_msg);
+						exit (EXIT_SUCCESS);
+					}
+				case '?':
+				case ':':
+					{
+						fprintf (stderr, "%s\n", try_help_msg);
+						exit (EXIT_FAILURE);
+					}
+				}
+		}
+
+	if (list_file == NULL)
+		{
+			error (0, 0, "Missing --list-file option\n%s", try_help_msg);
+			goto Exit;
+		}
+
+	if (universe_file == NULL)
+		{
+			error (0, 0, "Missing --universe-file option\n%s", try_help_msg);
+			goto Exit;
+		}
+
+	if (feature_file->len == 0)
+		{
+			error (0, 0, "Missing --feature-file option\n%s", try_help_msg);
+			goto Exit;
+		}
+
+	rc = gsia (list_file, universe_file, feature_file->len,
+			(const char **) feature_file->pdata);
 	if (rc != E_SUCCESS)
-		error (0, rc, "Error message");
+		goto Fail;
 
+Exit:
+	ptr_array_free (feature_file, 1);
 	return rc == E_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
+
+Fail:
+	error (0, rc, "Error message");
+	goto Exit;
 }
