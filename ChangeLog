@@ -1,3 +1,27 @@
+2019-03-09 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Version 0.5.0
+
+	* gsia.c,main.c: Add 'ignore-case' and 'save-diff' options
+
+2019-03-08 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* main.c (main): Add getopt framework
+
+	* gsia.c (gsia_save_comm): Coerce to (char *)
+
+	* ADD test: check_gsia_utils.c
+
+	* ADD: gsia.c (gsia_print, gsia_save_comm)
+
+2019-03-03 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* ADD: Multiple tests: main.c, error.c, gsia.c (static functions)
+
+2019-03-02 Thiago L. A. Miller <tmiller@mochsl.org.br>
+
+	* Add gsia.[ch] interface
+
 2019-03-01 Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 	* Version 0.4.0
