@@ -457,13 +457,15 @@ gsia_save_comm (const Gsia *g)
 
 	fprintf (fp, "# name: list_shared_with_universe.txt\n");
 	for (i = 0; i < g->universe_list->shared->len; i++)
-		fprintf (fp, "%s\n", ptr_array_get (g->universe_list->shared, i));
+		fprintf (fp, "%s\n",
+				(char *) ptr_array_get (g->universe_list->shared, i));
 
 	fprintf (fp, "\n");
 
 	fprintf (fp, "# name: list_uniq.txt\n");
 	for (i = 0; i < g->universe_list->uniq_to_file2->len; i++)
-		fprintf (fp, "%s\n", ptr_array_get (g->universe_list->uniq_to_file2, i));
+		fprintf (fp, "%s\n",
+				(char *) ptr_array_get (g->universe_list->uniq_to_file2, i));
 
 	for (j = 0; j < g->featurec; j++)
 		{
@@ -473,20 +475,23 @@ gsia_save_comm (const Gsia *g)
 			if (g->list_feature[j] != NULL)
 				{
 					for (i = 0; i < g->list_feature[j]->shared->len; i++)
-						fprintf (fp, "%s\n", ptr_array_get (g->list_feature[j]->shared, i));
+						fprintf (fp, "%s\n",
+								(char *) ptr_array_get (g->list_feature[j]->shared, i));
 				}
 
 			fprintf (fp, "\n");
 
 			fprintf (fp, "# name: feature%d_shared_with_universe.txt\n", j + 1);
 			for (i = 0; i < g->universe_feature[j]->shared->len; i++)
-				fprintf (fp, "%s\n", ptr_array_get (g->universe_feature[j]->shared, i));
+				fprintf (fp, "%s\n",
+						(char *) ptr_array_get (g->universe_feature[j]->shared, i));
 
 			fprintf (fp, "\n");
 
 			fprintf (fp, "# name: feature%d_uniq.txt\n", j + 1);
 			for (i = 0; i < g->universe_feature[j]->uniq_to_file2->len; i++)
-				fprintf (fp, "%s\n", ptr_array_get (g->universe_feature[j]->uniq_to_file2, i));
+				fprintf (fp, "%s\n",
+						(char *) ptr_array_get (g->universe_feature[j]->uniq_to_file2, i));
 		}
 
 	if (fclose (fp) == EOF)
