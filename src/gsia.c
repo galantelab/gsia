@@ -14,7 +14,6 @@
 #include "gsia.h"
 
 #define N_DIGITS 20
-#define COMM_FILE "gsia_comm.txt"
 
 struct _Gsia
 {
@@ -35,6 +34,12 @@ typedef struct _Gsia Gsia;
 
 static int
 cmpstringp (const void *p1, const void *p2)
+{
+	return strcmp (* (char * const *) p1, * (char * const *) p2);
+}
+
+static int
+casecmpstringp (const void *p1, const void *p2)
 {
 	return strcasecmp (* (char * const *) p1, * (char * const *) p2);
 }
@@ -268,17 +273,18 @@ Exit:
 }
 
 static int
-gsia_compare (Gsia *g)
+gsia_compare (Gsia *g, CompareFunc cmp_func)
 {
 	assert (g != NULL);
+	assert (cmp_func != NULL);
 
 	int errnum = 0;
 
-	ptr_array_uniq (g->list, cmpstringp);
-	ptr_array_uniq (g->universe, cmpstringp);
+	ptr_array_uniq (g->list, cmp_func);
+	ptr_array_uniq (g->universe, cmp_func);
 
 	g->universe_list = compare_arrays (g->universe, g->list,
-			cmpstringp, &errnum);
+			cmp_func, &errnum);
 	if (errnum != E_SUCCESS)
 		{
 			assert (errnum != 0 && g->universe_list == NULL);
@@ -301,10 +307,10 @@ gsia_compare (Gsia *g)
 
 	for (int i = 0; i < g->featurec; i++)
 		{
-			ptr_array_uniq (g->feature[i], cmpstringp);
+			ptr_array_uniq (g->feature[i], cmp_func);
 
 			g->universe_feature[i] = compare_arrays (g->universe, g->feature[i],
-					cmpstringp, &errnum);
+					cmp_func, &errnum);
 			if (errnum != E_SUCCESS)
 				{
 					assert (g->universe_feature[i] == NULL);
@@ -318,7 +324,7 @@ gsia_compare (Gsia *g)
 			if (g->universe_feature[i]->shared->len > 0)
 				{
 					g->list_feature[i] = compare_arrays (g->universe_list->shared,
-							g->universe_feature[i]->shared, cmpstringp, &errnum);
+							g->universe_feature[i]->shared, cmp_func, &errnum);
 					if (errnum != E_SUCCESS)
 						{
 							assert (g->list_feature[i] == NULL);
@@ -441,9 +447,10 @@ gsia_print (const Gsia *g)
 }
 
 static int
-gsia_save_comm (const Gsia *g)
+gsia_save_comm (const Gsia *g, const char *diff_file)
 {
 	assert (g != NULL);
+	assert (diff_file != NULL);
 
 	FILE *fp = NULL;
 	int i = 0;
@@ -451,7 +458,7 @@ gsia_save_comm (const Gsia *g)
 	int errnum = 0;
 	errno = 0;
 
-	fp = fopen (COMM_FILE, "w");
+	fp = fopen (diff_file, "w");
 	if (fp == NULL)
 		goto Fail;
 
@@ -502,17 +509,21 @@ Exit:
 
 Fail:
 	errnum = set_error_code (D_SYSTEM, errno);
-	error (0, 0, "Failed to write to '%s'", COMM_FILE);
+	error (0, 0, "Failed to write to '%s'", diff_file);
 	goto Exit;
 }
 
 int
-gsia (const char *list, const char *universe,
-		size_t featurec, const char *feature[])
+gsia (const char *list, const char *universe, size_t featurec,
+		const char *feature[], const char *diff, int ignore_case)
 {
 	assert (list != NULL && universe != NULL);
 	assert (feature != NULL && *feature != NULL);
 	assert (featurec > 0);
+
+	CompareFunc cmp_func = ignore_case
+		? casecmpstringp
+		: cmpstringp;
 
 	int errnum = 0;
 
@@ -530,7 +541,7 @@ gsia (const char *list, const char *universe,
 	if (errnum != E_SUCCESS)
 		goto Exit;
 
-	errnum = gsia_compare (g);
+	errnum = gsia_compare (g, cmp_func);
 	if (errnum != E_SUCCESS)
 		goto Exit;
 
@@ -540,9 +551,12 @@ gsia (const char *list, const char *universe,
 
 	gsia_print (g);
 
-	errnum = gsia_save_comm (g);
-	if (errnum != E_SUCCESS)
-		goto Exit;
+	if (diff != NULL)
+		{
+			errnum = gsia_save_comm (g, diff);
+			if (errnum != E_SUCCESS)
+				goto Exit;
+		}
 
 Exit:
 	gsia_free (g);
