@@ -10,6 +10,7 @@
 #include "array.h"
 #include "comm.h"
 #include "io.h"
+#include "utils.h"
 #include "error.h"
 #include "gsia.h"
 
@@ -31,18 +32,6 @@ struct _Gsia
 };
 
 typedef struct _Gsia Gsia;
-
-static int
-cmpstringp (const void *p1, const void *p2)
-{
-	return strcmp (* (char * const *) p1, * (char * const *) p2);
-}
-
-static int
-casecmpstringp (const void *p1, const void *p2)
-{
-	return strcasecmp (* (char * const *) p1, * (char * const *) p2);
-}
 
 static void
 gsia_free (Gsia *g)
@@ -407,7 +396,7 @@ gsia_print (const Gsia *g)
 	printf ("# name: feature.tsv\n");
 	printf (
 			"FeatureID\tFile\tTotal\tSharedWithUniverse\t%%SharedWithUniverse\t"
-			"SharedWithUniverseAndList\t%%SharedWithUniverseAndList\t"
+			"SharedWithUniverseAndList\t%%SharedWithUniverseAndList\tx\t"
 			"P(X=x)\tP(X<x)\tP(X<=x)\tP(X>x)\tP(X>=x)\n"
 	);
 
@@ -421,7 +410,7 @@ gsia_print (const Gsia *g)
 			if (g->list_feature[i] == NULL)
 				{
 					assert (g->universe_feature[i]->shared->len == 0);
-					printf ("\t.\t.\t.\t.\t.\t.\t.\n");
+					printf ("\t.\t.\t.\t.\t.\t.\t.\t.\n");
 					continue;
 				}
 
@@ -431,6 +420,7 @@ gsia_print (const Gsia *g)
 
 			if (g->stat != NULL)
 				{
+					printf ("\t%zu", g->list_feature[i]->shared->len);
 					printf ("\t%.*lf", N_DIGITS, g->stat[i]->pmf);
 					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfe_P);
 					printf ("\t%.*lf", N_DIGITS, g->stat[i]->cdfi_P);
