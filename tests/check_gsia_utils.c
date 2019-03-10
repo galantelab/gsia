@@ -38,6 +38,26 @@ START_TEST (test_trim)
 }
 END_TEST
 
+START_TEST (test_cmpstringp)
+{
+	const char *a = "aaa";
+	const char *b = "bbb";
+
+	ck_assert_int_gt (cmpstringp (&b, &a), 0);
+	ck_assert_int_eq (cmpstringp (&a, &a), 0);
+	ck_assert_int_lt (cmpstringp (&a, &b), 0);
+}
+END_TEST
+
+START_TEST (test_casecmpstringp)
+{
+	const char *a = "aaa";
+	const char *A = "AAA";
+
+	ck_assert_int_eq (casecmpstringp (&a, &A), 0);
+}
+END_TEST
+
 Suite *
 make_utils_suite (void)
 {
@@ -51,6 +71,8 @@ make_utils_suite (void)
 
 	tcase_add_test (tc_core, test_chomp);
 	tcase_add_test (tc_core, test_trim);
+	tcase_add_test (tc_core, test_cmpstringp);
+	tcase_add_test (tc_core, test_casecmpstringp);
 	suite_add_tcase (s, tc_core);
 
 	return s;
