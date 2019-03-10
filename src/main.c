@@ -4,9 +4,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <getopt.h>
 #include "array.c"
 #include "gsia.h"
+#include "utils.h"
 #include "error.h"
 
 static struct option opt[] =
@@ -27,6 +29,8 @@ static const char *help_msg =
 	"Usage: " PACKAGE_NAME " [-hv]\n"
 	"       " PACKAGE_NAME " [-i] [-d FILE] -l FILE -u FILE -f FILE ..\n"
 	"\n"
+	"Compute set enrichment analysis\n"
+	"\n"
 	"Options:\n"
 	"   -h, --help             Show help options\n"
 	"   -v, --version          Show current version\n"
@@ -37,7 +41,13 @@ static const char *help_msg =
 	"Mandatory Options:\n"
 	"   -l, --list-file        LIST in test for observed successes\n"
 	"   -u, --universe-file    Population entries LIST\n"
-	"   -f, --feature-file     Array of success state entries LIST's\n";
+	"   -f, --feature-file     ARRAY of success state entries LIST\n"
+	"                          It can be passed multiple times\n"
+	"\n"
+	"ARRAY is a string list of FILES separated by space, colon,\n"
+	"semicolon or comma\n"
+	"\n"
+	"LIST is a FILE with one entry by line\n";
 
 static const char *try_help_msg =
 	"Try '" PACKAGE_NAME " --help' for more information";
@@ -95,9 +105,15 @@ main (int argc, char *argv[])
 					}
 				case 'f':
 					{
-						rc = ptr_array_add (feature_file, optarg);
-						if (rc != E_SUCCESS)
-							goto Fail;
+						char *scratch = NULL;
+						char *token = strtok_r (optarg, ",;: ", &scratch);
+						while (token != NULL)
+							{
+								rc = ptr_array_add (feature_file, token);
+								if (rc != E_SUCCESS)
+									goto Fail;
+								token = strtok_r (NULL, ",;: ", &scratch);
+							}
 						break;
 					}
 				case 'v':
@@ -137,8 +153,11 @@ main (int argc, char *argv[])
 			goto Exit;
 		}
 
+	ptr_array_uniq (feature_file, cmpstringp);
+
 	rc = gsia (list_file, universe_file, feature_file->len,
 			(const char **) feature_file->pdata, diff_file, ignore_case);
+
 	if (rc != E_SUCCESS)
 		goto Fail;
 
