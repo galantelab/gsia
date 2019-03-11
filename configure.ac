@@ -27,6 +27,7 @@ PKG_CHECK_MODULES([CHECK], [check], ,
 
 # Checks for header files.
 AC_HEADER_STDC
+AC_GNU_SOURCE
 AC_HEADER_ASSERT
 AC_CHECK_HEADERS([gsl/gsl_randist.h gsl/gsl_cdf.h getopt.h check.h])
 
