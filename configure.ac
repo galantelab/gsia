@@ -7,11 +7,12 @@ AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
+AC_USE_SYSTEM_EXTENSIONS
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CC_C99
@@ -27,7 +28,6 @@ PKG_CHECK_MODULES([CHECK], [check], ,
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_GNU_SOURCE
 AC_HEADER_ASSERT
 AC_CHECK_HEADERS([gsl/gsl_randist.h gsl/gsl_cdf.h getopt.h check.h])
 

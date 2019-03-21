@@ -3,6 +3,7 @@
 /build/
 Makefile
 Makefile.in
+INSTALL
 aclocal.m4
 app.info
 compile
